@@ -63,6 +63,24 @@ func SI(f1 float64, f2 float64, velkt float64) (SI float64) {
 	return livdB
 }
 
+// f1,f2
+func DI(f1 float64, f2 float64, sideA float64, sideB float64) (DI float64) {
+	x := math.Sqrt(f1*f2) / 1000
+	if x == 0 {
+		return 0
+	}
+
+	if sideA == 0 {
+		return 0
+	}
+	if sideB == 0 {
+		return 0
+	}
+	landa := 1.53 / x
+	guad := 10 * math.Log10((4*3.14*(sideA/100)*(sideB/100))/math.Pow(landa, 2))
+	return guad
+}
+
 var (
 	freshWaterMinTemp    = 4.0
 	freshWaterMaxTemp    = 86.0
