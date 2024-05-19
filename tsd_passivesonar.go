@@ -11,7 +11,7 @@ const Version = "0.0.2"
 // https://www.betasom.it/forum/index.php?/topic/49098-sonar-computazioni-del-livello-del-rumore-del-mare-in-visual-basic/
 // Converted to Golang
 func NL(x float64, ss string) (NL float64) {
-	
+
 	// calcolo del livello spettrale del rumore del mare
 	k := 5 / (20 * math.Log(2) / math.Log(10))
 	Y := 20 * math.Log(math.Pow(x, k)) / math.Log(10)
@@ -36,9 +36,36 @@ func NL(x float64, ss string) (NL float64) {
 	return livdB
 }
 
+// http://www.sonar-info.info/p72/72pagina.html
+func SI(f1 float64, f2 float64, velkt float64) (SI float64) {
+	x := math.Sqrt(f1*f2) / 1000
+	if x == 0 {
+		return 0
+	}
+
+	db := 6.67
+	k := db / (20 * math.Log(2) / math.Log(10))
+	Y := 20 * math.Log(math.Pow(x, k)) / math.Log(10)
+
+	var livdB float64
+	switch velkt {
+	case 10:
+		livdB = 127.5 - Y
+	case 15:
+		livdB = 138 - Y
+	case 20:
+		livdB = 145.4 - Y
+	case 25:
+		livdB = 151.4 - Y
+	default:
+		return 0
+	}
+	return livdB
+}
+
 var (
-	freshWaterMinTemp = 4.0
-	freshWaterMaxTemp = 86.0
+	freshWaterMinTemp    = 4.0
+	freshWaterMaxTemp    = 86.0
 	freshWaterSoundSpeed = map[float64]float64{
 		4.0: 1421.62, 17.5: 1474.38, 39.2: 1421.62, 63.5: 1474.38,
 		4.5: 1423.90, 18.0: 1476.01, 40.1: 1423.90, 64.4: 1476.01,
@@ -70,7 +97,7 @@ var (
 	}
 )
 
-// Sound speed in fresh water. 
+// Sound speed in fresh water.
 // Values according to https://bathylogger.com/wp-content/uploads/2015/10/Speed-of-Sound-in-Freshwater.pdf
 func GetSoundSpeedInFreshWater(temp float64) (float64, error) {
 	if temp > freshWaterMaxTemp || temp < freshWaterMinTemp {
@@ -111,14 +138,14 @@ func CalcSoundSpeed(t, p, s float64) (float64, error) {
 	}
 
 	c0 := 1449.14
-	Dct := 4.5721*t - 4.4532E-2*math.Pow(t, 2) - 2.6045E-4*math.Pow(t, 3) + 7.9851E-6*math.Pow(t, 4)
-	Dcs := 1.39799*(s-35) - 1.69202E-3*math.Pow(s-35, 2)
-	Dcp := 1.63432*p - 1.06768E-3*math.Pow(p, 2) + 3.73403E-6*math.Pow(p, 3) - 3.6332E-8*math.Pow(p, 4)
-	Dcstp := (s-35)*(-1.1244E-2*t+7.7711E-7*math.Pow(t, 2)+7.85344E-4*p-
-		1.3458E-5*math.Pow(p, 2)+3.2203E-7*p*t+1.6101E-8*math.Pow(t, 2)*p)+
-		p*(-1.8974E-3*t+7.6287E-5*math.Pow(t, 2)+4.6176E-7*math.Pow(t, 3))+
-		math.Pow(p, 2)*(-2.6301E-5*t+1.9302E-7*math.Pow(t, 2))+
-		math.Pow(p, 3)*(-2.0831E-7*t)
+	Dct := 4.5721*t - 4.4532e-2*math.Pow(t, 2) - 2.6045e-4*math.Pow(t, 3) + 7.9851e-6*math.Pow(t, 4)
+	Dcs := 1.39799*(s-35) - 1.69202e-3*math.Pow(s-35, 2)
+	Dcp := 1.63432*p - 1.06768e-3*math.Pow(p, 2) + 3.73403e-6*math.Pow(p, 3) - 3.6332e-8*math.Pow(p, 4)
+	Dcstp := (s-35)*(-1.1244e-2*t+7.7711e-7*math.Pow(t, 2)+7.85344e-4*p-
+		1.3458e-5*math.Pow(p, 2)+3.2203e-7*p*t+1.6101e-8*math.Pow(t, 2)*p) +
+		p*(-1.8974e-3*t+7.6287e-5*math.Pow(t, 2)+4.6176e-7*math.Pow(t, 3)) +
+		math.Pow(p, 2)*(-2.6301e-5*t+1.9302e-7*math.Pow(t, 2)) +
+		math.Pow(p, 3)*(-2.0831e-7*t)
 
 	result := c0 + Dct + Dcs + Dcp + Dcstp
 
