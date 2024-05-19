@@ -1,0 +1,6 @@
+package tsd_passivesonar // import "tsd_passivesonar"
+
+const Version = "0.0.2"
+func CalcSoundSpeed(t, p, s float64) (float64, error)
+func GetSoundSpeedInFreshWater(temp float64) (float64, error)
+func NL(x float64, ss string) (NL float64)
